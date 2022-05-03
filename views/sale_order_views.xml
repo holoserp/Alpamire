@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_inherit_alpamire" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.alpamire</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+<!--HIDE BUTTON PREVIEW-->
+            <xpath expr="//button[@name='preview_sale_order']" position="attributes">
+                <attribute name="groups">sales_team.group_sale_manager</attribute>
+            </xpath>
+<!--DOMAIN IN FIELDS PARTNER RELATED-->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="domain">[('is_company', '=', True)]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
+                <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+            </xpath>
+<!--ADD BRAND_ID FIELD-->
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="brand_id" domain="[('user_ids', 'in', uid)]" options="{'no_create': True, 'no_create_edit':True}"/>
+            </xpath>
+            <xpath expr="//field[@name='pricelist_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+<!--ADD DOMAIN FOR ONLY PRODUCTS IN BRAND SALE ORDER-->
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_template_id']" position="attributes">
+                <attribute name="domain">[('product_brand_id','=',parent.brand_id)]</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+            </xpath>
+<!--INVISIBLE CONTROLS-->
+            <xpath expr="//page/field[@name='order_line']/tree/control/create[@name='add_section_control']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page/field[@name='order_line']/tree/control/create[@name='add_note_control']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+<!--READONLY ORDER_LINE FIELDS-->
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+<!--INVISIBLE PAGES FOR SALE USERS-->
+            <xpath expr="//page[@name='other_information']" position="attributes">
+                <attribute name="groups">sales_team.group_sale_manager</attribute>
+            </xpath>
+            <xpath expr="//page[@name='optional_products']" position="attributes">
+                <attribute name="groups">sales_team.group_sale_manager</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_agent_form_inherit_alpamire" model="ir.ui.view">
+        <field name="name">sale.agent.order.inherit.form.alpamire</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_commission.view_order_agent_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group//button[@name='recompute_lines_agents']" position="attributes">
+                <attribute name="groups">sales_team.group_sale_manager</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
