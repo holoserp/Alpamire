@@ -43,7 +43,11 @@
                     <div class="o_barcode_line_details flex-grow-1 flex-column flex-nowrap">
                         <div class="o_barcode_line_title pb-1">
                             <i class="fa fa-fw fa-tags"/>
-                            <span class="product-label" t-esc="line.display_name || line.product_id.display_name"/>
+<!--                            <span class="product-label" t-esc="line.display_name || line.product_id.display_name"/>-->
+                            <span class="product-label">
+                                <t t-esc="line.display_name || line.product_id.display_name"/>
+                                <b><t t-esc="line.product_id.item"/></b>
+                            </span>
                         </div>
                         <div name="quantity"> <!-- Name used for inheritance -->
                             <i class="fa fa-fw fa-cube"/>
