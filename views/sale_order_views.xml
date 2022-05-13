@@ -14,14 +14,17 @@
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="domain">[('is_company', '=', True)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+                <attribute name="context">{'show_address': 1}</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
                 <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+                <attribute name="context">{'show_address': 1}</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
                 <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+                <attribute name="context">{'show_address': 1}</attribute>
             </xpath>
 <!--ADD BRAND_ID FIELD-->
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
@@ -47,6 +50,12 @@
             <xpath expr="//page/field[@name='order_line']/tree/control/create[@name='add_note_control']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+ <!--FIELD NEW FIELDS-->
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_uom']" position="after">
+                <field name="qty_inner" string="Inner Qty" optional="hide"/>
+                <field name="qty_checked" string="Check Qty" optional="hide"/>
+            </xpath>
+
 <!--READONLY ORDER_LINE FIELDS-->
             <xpath expr="//page/field[@name='order_line']/tree/field[@name='name']" position="attributes">
                 <attribute name="readonly">1</attribute>
@@ -91,6 +100,24 @@
                 <attribute name="force_save">1</attribute>
             </xpath>
         </field>
+    </record>
+
+    <record id="model_sale_order_action_create_batch" model="ir.actions.server">
+        <field name="name">Crear Batch</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_create_batch()</field>
+    </record>
+
+    <record id="sale_order_to_batch_action_sale_order" model="ir.actions.act_window">
+        <field name="name">Add to batch</field>
+        <field name="res_model">stock.picking.to.batch</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_stock_picking"/>
+        <field name="binding_view_types">list</field>
     </record>
 
 </odoo>

@@ -7,7 +7,8 @@ class Product(models.Model):
     _inherit = 'product.product'
 
     item = fields.Char('Item', copy=False, help="Used for product identification.")
-    #
+    inner = fields.Float('Inner', copy=False, help="Used for Ineer product.")
+
     # @api.model
     # def get_all_products_by_barcode(self):
     #     products = self.env['product.product'].search_read(
