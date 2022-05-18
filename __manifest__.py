@@ -11,6 +11,7 @@
                 'account',
                 'base',
                 'product_brand',
+                'product_matrix',
                 'purchase_order_type',
                 'sale',
                 'sale_commission',
@@ -39,6 +40,7 @@
         'import_libraries.xml',
     ],
     'qweb': [
+        "static/src/xml/product_matrix.xml",
         "static/src/xml/qweb_templates.xml",
     ],
 }

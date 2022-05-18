@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 
 
 class StockPicking(models.Model):
@@ -62,3 +63,52 @@ class StockPicking(models.Model):
             picking['source_location_list'] = source_location_list
             picking['destination_location_list'] = destination_location_list
         return pickings
+
+    # ToDo REV put in pack for sequence per SaleOrder maybe add new modelo sale.order.package to set sequence
+    # def _put_in_pack(self, move_line_ids, create_package_level=True):
+    #     package = False
+    #     for pick in self:
+    #         move_lines_to_pack = self.env['stock.move.line']
+    #         package = self.env['stock.quant.package'].create({})
+    #         sequence = self.env['sale.order'].search([('name', '=', pick.origin)]).name
+    #         package.write({"name": sequence})
+    #
+    #         precision_digits = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+    #         if float_is_zero(move_line_ids[0].qty_done, precision_digits=precision_digits):
+    #             for line in move_line_ids:
+    #                 line.qty_done = line.product_uom_qty
+    #
+    #         for ml in move_line_ids:
+    #             if float_compare(ml.qty_done, ml.product_uom_qty,
+    #                              precision_rounding=ml.product_uom_id.rounding) >= 0:
+    #                 move_lines_to_pack |= ml
+    #             else:
+    #                 quantity_left_todo = float_round(
+    #                     ml.product_uom_qty - ml.qty_done,
+    #                     precision_rounding=ml.product_uom_id.rounding,
+    #                     rounding_method='UP')
+    #                 done_to_keep = ml.qty_done
+    #                 new_move_line = ml.copy(
+    #                     default={'product_uom_qty': 0, 'qty_done': ml.qty_done})
+    #                 vals = {'product_uom_qty': quantity_left_todo, 'qty_done': 0.0}
+    #                 if pick.picking_type_id.code == 'incoming':
+    #                     if ml.lot_id:
+    #                         vals['lot_id'] = False
+    #                     if ml.lot_name:
+    #                         vals['lot_name'] = False
+    #                 ml.write(vals)
+    #                 new_move_line.write({'product_uom_qty': done_to_keep})
+    #                 move_lines_to_pack |= new_move_line
+    #         if create_package_level:
+    #             package_level = self.env['stock.package_level'].create({
+    #                 'package_id': package.id,
+    #                 'picking_id': pick.id,
+    #                 'location_id': False,
+    #                 'location_dest_id': move_line_ids.mapped('location_dest_id').id,
+    #                 'move_line_ids': [(6, 0, move_lines_to_pack.ids)],
+    #                 'company_id': pick.company_id.id,
+    #             })
+    #         move_lines_to_pack.write({
+    #             'result_package_id': package.id,
+    #         })
+    #     return package
