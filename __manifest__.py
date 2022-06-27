@@ -16,10 +16,12 @@
                 'sale',
                 'sale_commission',
                 'sale_order_type',
+                'sale_stock',
                 'stock',
                 'stock_barcode',
                 ],
     'data': [
+        'security/groups.xml',
         'security/ir.model.access.csv',
         'security/security.xml',
         # 'views/account_move_views.xml',
@@ -33,6 +35,7 @@
         'views/stock_backorder_views.xml',
         'report/report_sale_take_inventory.xml',
         'report/sale_report.xml',
+        'wizard/partner_risk_exceeded_view.xml',
         # 'wizard/stock_backorder_confirmation_views.xml',
         # 'security/ir.model.access.csv',
         # 'views/report_financial.xml',
@@ -41,6 +44,6 @@
     ],
     'qweb': [
         "static/src/xml/product_matrix.xml",
-        "static/src/xml/qweb_templates.xml",
+        # "static/src/xml/qweb_templates.xml",
     ],
 }

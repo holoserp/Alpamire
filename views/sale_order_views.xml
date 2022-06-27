@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="view_order_tree_inherit_alpamire" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit.alpamire</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_status']" position="before">
+                <field name="carrier_tracking_ref"/>
+                <field widget="progressbar" name="delivery_progress"/>
+                <field name="related_sale_orders"/>
+                <field name="state" decoration-success="state == 'sale' or state == 'done'" decoration-info="state == 'draft' or state == 'sent'" widget="badge"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_order_form_inherit_alpamire" model="ir.ui.view">
         <field name="name">sale.order.form.inherit.alpamire</field>
         <field name="model">sale.order</field>
@@ -27,8 +41,16 @@
                 <attribute name="context">{'show_address':1,'default_type':'delivery'}</attribute>
             </xpath>
 <!--ADD BRAND_ID FIELD-->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="company_group_id" readonly="1"/>
+                <field name="need_invoice" widget="radio" options="{'horizontal': true}"/>
+            </xpath>
+
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="brand_id" domain="[('user_ids', 'in', uid)]" options="{'no_create': True, 'no_create_edit':True}"/>
+                <field name="carrier_id"/>
+                <field name="carrier_tracking_ref"/>
+                <field name="related_sale_orders"/>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="attributes">
                 <attribute name="readonly">1</attribute>
@@ -59,6 +81,7 @@
 <!--READONLY ORDER_LINE FIELDS-->
             <xpath expr="//page/field[@name='order_line']/tree/field[@name='name']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="optional">hide</attribute>
             </xpath>
             <xpath expr="//page/field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
                 <attribute name="readonly">1</attribute>
@@ -68,7 +91,16 @@
             </xpath>
             <xpath expr="//page/field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
                 <attribute name="readonly">1</attribute>
+                <attribute name="optional">hide</attribute>
             </xpath>
+            <xpath expr="//page/field[@name='order_line']/tree/field[@name='discount']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_info']" position="inside">
+                <field name="delivery_progress"/>
+            </xpath>
+
 <!--INVISIBLE PAGES FOR SALE USERS-->
             <xpath expr="//page[@name='other_information']" position="attributes">
                 <attribute name="groups">sales_team.group_sale_manager</attribute>
@@ -87,6 +119,34 @@
             <xpath expr="//group//button[@name='recompute_lines_agents']" position="attributes">
                 <attribute name="groups">sales_team.group_sale_manager</attribute>
             </xpath>
+<!--            <xpath expr="//button[@name='button_edit_agents']" position="attributes">-->
+<!--                <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
+<!--            <xpath expr="//field[@name='commission_status']" position="attributes">-->
+<!--                <attribute name="invisible">1</attribute>-->
+<!--            </xpath>-->
+        </field>
+    </record>
+
+    <record id="view_order_form_inherit_sale_stock_qty_inherit_alpamire" model="ir.ui.view">
+        <field name="name">sale.order.line.tree.sale.stock.qty.inherit.form.alpamire</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock_qty"/>
+        <field name="arch" type="xml">
+            <xpath expr="//widget[@name='qty_at_date_widget']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_form_inherit_sale_stock_inherit_alpamire" model="ir.ui.view">
+        <field name="name">sale.order.form.sale.stock.inherit.form.alpamire</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_packaging']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
 
@@ -96,7 +156,7 @@
         <field name="inherit_id" ref="sale_order_type.sot_view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='type_id']" position="attributes">
-                <attribute name="readonly">1</attribute>
+                <attribute name="readonly">0</attribute>
                 <attribute name="force_save">1</attribute>
             </xpath>
         </field>

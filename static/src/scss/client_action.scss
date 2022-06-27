@@ -3,6 +3,7 @@
     flex-direction: column;
     height: 100%;
     background-color: white;
+    overscroll-behavior-y: contain;
 
     .o_strong {
         font-weight: bold;
