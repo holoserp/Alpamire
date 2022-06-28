@@ -6,11 +6,17 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                 <field name="log_book"/>
+            </xpath>
             <xpath expr="//field[@name='invoice_status']" position="before">
                 <field name="carrier_tracking_ref"/>
                 <field widget="progressbar" name="delivery_progress"/>
                 <field name="related_sale_orders"/>
-                <field name="state" decoration-success="state == 'sale' or state == 'done'" decoration-info="state == 'draft' or state == 'sent'" widget="badge"/>
+                <field name="state"
+                       decoration-success="state == 'sale' or state == 'done'"
+                       decoration-info="state == 'draft' or state == 'sent'"
+                       widget="badge"/>
             </xpath>
         </field>
     </record>
@@ -20,6 +26,18 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+
+            <xpath expr="//form//header//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale,printed"/>
+            </xpath>
+
+            <xpath expr="//button[@name='action_view_invoice']" position="before">
+                <button type="object" name="action_view_batch" class="oe_stat_button" icon="fa-truck"
+                        attrs="{'invisible': [('batch_count', '=', 0)]}" groups="base.group_user">
+                    <field name="batch_count" widget="statinfo" string="Batch"/>
+                </button>
+            </xpath>
+
 <!--HIDE BUTTON PREVIEW-->
             <xpath expr="//button[@name='preview_sale_order']" position="attributes">
                 <attribute name="groups">sales_team.group_sale_manager</attribute>
@@ -163,7 +181,7 @@
     </record>
 
     <record id="model_sale_order_action_create_batch" model="ir.actions.server">
-        <field name="name">Crear Batch</field>
+        <field name="name">Imprimir Batch</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_view_types">list</field>
@@ -178,6 +196,15 @@
         <field name="target">new</field>
         <field name="binding_model_id" ref="model_stock_picking"/>
         <field name="binding_view_types">list</field>
+    </record>
+
+    <record id="model_sale_order_action_sale_order_printed" model="ir.actions.server">
+        <field name="name">Imprimir One</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_print_sale_order_to_delivery()</field>
     </record>
 
 </odoo>

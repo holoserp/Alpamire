@@ -32,6 +32,11 @@
         <field name="category_id" ref="module_category_menu_management"/>
     </record>
 
+    <record id="group_menu_point_of_sale" model="res.groups">
+        <field name="name">Punto de Venta</field>
+        <field name="category_id" ref="module_category_menu_management"/>
+    </record>
+
     <record id="group_menu_purchase" model="res.groups">
         <field name="name">Compra</field>
         <field name="category_id" ref="module_category_menu_management"/>

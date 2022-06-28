@@ -21,6 +21,7 @@
                 'stock_barcode',
                 ],
     'data': [
+        'data/ir_sequence.xml',
         'security/groups.xml',
         'security/ir.model.access.csv',
         'security/security.xml',

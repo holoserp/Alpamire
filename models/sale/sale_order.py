@@ -7,6 +7,74 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def action_create_batch(self):
+        PickingIds = []
+        PackingIds = []
+        for rec in self:
+            picking = rec.picking_ids.filtered(lambda p: p.picking_type_id.id == 3)
+            PickingIds.append(picking)
+            packing = rec.picking_ids.filtered(lambda p: p.picking_type_id.id == 4)
+            PackingIds.append(packing)
+        batch_picking = self.env['stock.picking.batch'].create({
+            'company_id': self.env.company.id,
+            'user_id': self.user_id.id,
+            'picking_type_id': PickingIds[0].picking_type_id.id,
+            'picking_ids': [(4, pick.id) for pick in PickingIds],
+        }).action_confirm()
+        batch_packing = self.env['stock.picking.batch'].create({
+            'company_id': self.env.company.id,
+            'user_id': self.user_id.id,
+            'picking_type_id': PackingIds[0].picking_type_id.id,
+            'picking_ids': [(4, pack.id) for pack in PackingIds],
+        }).action_confirm()
+        # ToDO REV
+        self.create_log_book()
+        self.write({'state': 'printed'})
+        return self.env.ref('sale.action_report_saleorder').report_action(self)
+
+    batch_count = fields.Integer(string='Batch Count', compute='_compute_batch_ids')
+    batch_ids = fields.One2many('stock.picking.batch', string='Batch Count', compute='_compute_batch_ids')
+
+    @api.depends('picking_ids')
+    def _compute_batch_ids(self):
+        for order in self:
+            order.batch_ids = self.env['stock.picking.batch'].search([('picking_ids', 'in', order.picking_ids.ids)])
+            order.batch_count = len(order.batch_ids)
+
+    def action_view_batch(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("stock_picking_batch.stock_picking_batch_action")
+        batches = self.mapped('batch_ids')
+        if len(batches) > 1:
+            action['domain'] = [('id', 'in', batches.ids)]
+        elif batches:
+            form_view = [(self.env.ref('stock_picking_batch.stock_picking_batch_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state, view) for state, view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = batches.id
+        # Prepare the context.
+        batch_id = batches
+        if batch_id:
+            batch_id = batch_id[0]
+        else:
+            batch_id = batches[0]
+        action['context'] = dict(self._context)
+        return action
+
+    state = fields.Selection(selection_add=[('printed', 'Impreso')])
+    log_book = fields.Char(string='Log Book', copy=False)
+
+    def create_log_book(self):
+        self.log_book = self.env['ir.sequence'].next_by_code('sale.order.log.book')
+
+    def action_print_sale_order_to_delivery(self):
+        if self.filtered(lambda so: so.state != 'done'):
+            raise UserError(_('Only done orders can be printed directly.'))
+        self.create_log_book()
+        self.write({'state': 'printed'})
+        return self.env.ref('sale.action_report_saleorder').report_action(self)
+
     related_sale_orders = fields.Char(string='Pedidos Relacionados', copy=False)
 
     @api.model
@@ -78,23 +146,3 @@ class SaleOrder(models.Model):
                 sequence = order.type_id.sequence_id.next_by_id()
                 order.write({"name": sequence})
         return super().action_confirm()
-
-    def action_create_batch(self):
-        self.ensure_one()
-        print('Lugar')
-        pickings = self.env['stock.picking'].search('origin', 'like', self.name)
-        print('pickings', pickings)
-
-            # company = pickings.company_id
-            # batch = self.env['stock.picking.batch'].create({
-            #     'user_id': self.user_id.id,
-            #     'company_id': company.id,
-            #     'picking_type_id': pickings[0].picking_type_id.id,
-            # })
-            # pickings.write({'batch_id': batch.id})
-
-    # printed = fields.Boolean()
-    #
-    # def do_print_picking(self):
-    #     self.write({'printed': True})
-    #     return self.env.ref('stock.action_report_picking').report_action(self)
