@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_picking_batch_tree_alpamire" model="ir.ui.view">
+        <field name="name">stock.picking.batch.tree.alpamire</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="picking_type_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_picking_batch_form_alpamire" model="ir.ui.view">
+        <field name="name">stock.picking.batch.form.alpamire</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_see_picking_packages" string="Paquetes" type="object" class="oe_stat_button" icon="fa-cubes"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

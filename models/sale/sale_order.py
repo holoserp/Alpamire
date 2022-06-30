@@ -7,14 +7,24 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    # -------------------------------------------------------------------------
+    # METHODS
+    # -------------------------------------------------------------------------
+    def action_blocked_sale_order(self):
+        for rec in self:
+            rec.write({'status': 'blocked'})
+
     def action_create_batch(self):
         PickingIds = []
         PackingIds = []
+        DeliveryIds = []
         for rec in self:
             picking = rec.picking_ids.filtered(lambda p: p.picking_type_id.id == 3)
             PickingIds.append(picking)
             packing = rec.picking_ids.filtered(lambda p: p.picking_type_id.id == 4)
             PackingIds.append(packing)
+            delivery = rec.picking_ids.filtered(lambda p: p.picking_type_id.id == 2)
+            DeliveryIds.append(delivery)
         batch_picking = self.env['stock.picking.batch'].create({
             'company_id': self.env.company.id,
             'user_id': self.user_id.id,
@@ -27,9 +37,15 @@ class SaleOrder(models.Model):
             'picking_type_id': PackingIds[0].picking_type_id.id,
             'picking_ids': [(4, pack.id) for pack in PackingIds],
         }).action_confirm()
-        # ToDO REV
+        batch_delivery = self.env['stock.picking.batch'].create({
+            'company_id': self.env.company.id,
+            'user_id': self.user_id.id,
+            'picking_type_id': DeliveryIds[0].picking_type_id.id,
+            'picking_ids': [(4, out.id) for out in DeliveryIds],
+        }).action_confirm()
+        # ToDO REV in Production
         self.create_log_book()
-        self.write({'state': 'printed'})
+        self.write({'status': 'printed'})
         return self.env.ref('sale.action_report_saleorder').report_action(self)
 
     batch_count = fields.Integer(string='Batch Count', compute='_compute_batch_ids')
@@ -62,8 +78,16 @@ class SaleOrder(models.Model):
         action['context'] = dict(self._context)
         return action
 
-    state = fields.Selection(selection_add=[('printed', 'Impreso')])
-    log_book = fields.Char(string='Log Book', copy=False)
+    state = fields.Selection(selection_add=[('printed', 'Impreso'),
+                                            ])
+    status = fields.Selection([('printed', 'Impreso'),
+                               ('picking', 'Surtido'),
+                               ('packing', 'Empacado'),
+                               ('invoiced', 'Facturado'),
+                               ('blocked', 'Detenido'),
+                               ('send', 'Enviado')], string='Status')
+
+    log_book = fields.Char(string='Bitácora', copy=False)
 
     def create_log_book(self):
         self.log_book = self.env['ir.sequence'].next_by_code('sale.order.log.book')
@@ -72,7 +96,7 @@ class SaleOrder(models.Model):
         if self.filtered(lambda so: so.state != 'done'):
             raise UserError(_('Only done orders can be printed directly.'))
         self.create_log_book()
-        self.write({'state': 'printed'})
+        self.write({'status': 'printed'})
         return self.env.ref('sale.action_report_saleorder').report_action(self)
 
     related_sale_orders = fields.Char(string='Pedidos Relacionados', copy=False)
@@ -140,9 +164,9 @@ class SaleOrder(models.Model):
         return self.env["sale.order.type"].search([("company_id", "in", [self.env.company.id, False]),
                                                    ("user_id", "=", [self.env.user.id, False])], limit=1)
 
-    def action_confirm(self):
-        for order in self:
-            if order.type_id:
-                sequence = order.type_id.sequence_id.next_by_id()
-                order.write({"name": sequence})
-        return super().action_confirm()
+    # def action_confirm(self):
+    #     for order in self:
+    #         if order.type_id:
+    #             sequence = order.type_id.sequence_id.next_by_id()
+    #             order.write({"name": sequence})
+    #     return super().action_confirm()

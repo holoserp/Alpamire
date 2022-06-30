@@ -34,6 +34,7 @@
         'views/sale_order_type_view.xml',
         'views/sale_order_views.xml',
         'views/stock_backorder_views.xml',
+        'views/stock_picking_batch_views.xml',
         'report/report_sale_take_inventory.xml',
         'report/sale_report.xml',
         'wizard/partner_risk_exceeded_view.xml',
