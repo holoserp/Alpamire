@@ -17,10 +17,20 @@
         <field name="model">stock.picking.batch</field>
         <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form"/>
         <field name="arch" type="xml">
+
             <xpath expr="//div[hasclass('oe_title')]" position="before">
                 <div class="oe_button_box" name="button_box">
                     <button name="action_see_picking_packages" string="Paquetes" type="object" class="oe_stat_button" icon="fa-cubes"/>
                 </div>
+            </xpath>
+
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="action_set_quantities_to_reservation" string="Set quantities" type="object"
+                        />
+<!--                        attrs="{'invisible': [-->
+<!--                            '|',-->
+<!--                                ('state', '!=', 'in_progress'),-->
+<!--                                ('show_validate', '=', False)]}"-->
             </xpath>
         </field>
     </record>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_picking_form_alpamire" model="ir.ui.view">
+        <field name="name">stock.picking.form.alpamire</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="after">
+                <button name="action_set_quantities_to_reservation"
+                        attrs="{'invisible': ['|', ('show_validate', '=', False), ('immediate_transfer', '=', True)]}"
+                        string="Set quantities" type="object" groups="stock.group_stock_user" class="o_btn_validate" data-hotkey="g"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
+

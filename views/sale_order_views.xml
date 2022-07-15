@@ -65,6 +65,7 @@
                 <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
                 <attribute name="options">{'no_create': True, 'no_create_edit':True, 'always_reload': True}</attribute>
                 <attribute name="context">{'show_address':1,'default_type':'invoice'}</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
                 <attribute name="domain">[('parent_id', '=', partner_id)]</attribute>
@@ -140,23 +141,16 @@
             <xpath expr="//page[@name='optional_products']" position="attributes">
                 <attribute name="groups">sales_team.group_sale_manager</attribute>
             </xpath>
-        </field>
-    </record>
 
-    <record id="view_order_agent_form_inherit_alpamire" model="ir.ui.view">
-        <field name="name">sale.agent.order.inherit.form.alpamire</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale_commission.view_order_agent_form_inherit"/>
-        <field name="arch" type="xml">
-            <xpath expr="//group//button[@name='recompute_lines_agents']" position="attributes">
-                <attribute name="groups">sales_team.group_sale_manager</attribute>
+            <xpath expr="/form/sheet/notebook" position="after">
+                <group>
+                    <group>
+                        <field name="tot_products" />
+                        <field name="tot_qty" />
+                    </group>
+                </group>
             </xpath>
-<!--            <xpath expr="//button[@name='button_edit_agents']" position="attributes">-->
-<!--                <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
-<!--            <xpath expr="//field[@name='commission_status']" position="attributes">-->
-<!--                <attribute name="invisible">1</attribute>-->
-<!--            </xpath>-->
+
         </field>
     </record>
 
@@ -190,6 +184,7 @@
             <xpath expr="//field[@name='type_id']" position="attributes">
                 <attribute name="readonly">0</attribute>
                 <attribute name="force_save">1</attribute>
+                <attribute name="domain">[('user_id', '=', uid)]</attribute>
             </xpath>
         </field>
     </record>

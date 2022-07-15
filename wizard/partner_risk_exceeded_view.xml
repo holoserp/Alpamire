@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="account_financial_risk.partner_risk_exceeded_wizard"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_continue']" position="after">
-                <button string="Solicitar Autorización" class="btn-primary" special="cancel" />
+                <button name="request_authorization" string="Solicitar Autorización" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>

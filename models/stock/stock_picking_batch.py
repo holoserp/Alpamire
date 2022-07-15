@@ -6,6 +6,10 @@ from odoo import models, fields, api, _
 class StockPickingBatch(models.Model):
     _inherit = "stock.picking.batch"
 
+    def action_set_quantities_to_reservation(self):
+        self.ensure_one()
+        self.picking_ids.filtered("show_validate").action_set_quantities_to_reservation()
+
     package_ids = fields.Many2many('stock.quant.package', compute='_compute_picking_packages', string='Packages')
 
     # @api.depends('move_line_ids', 'move_line_ids.result_package_id')

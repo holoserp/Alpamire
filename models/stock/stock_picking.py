@@ -7,6 +7,9 @@ from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    def action_set_quantities_to_reservation(self):
+        self.move_lines._set_quantities_to_reservation()
+
     def get_barcode_view_state(self):
         """ Return the initial state of the barcode view as a dict.
         """
